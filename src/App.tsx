@@ -1,27 +1,28 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
+import '@tensorflow/tfjs-backend-webgl';
 import logo from './logo.svg';
 import './App.css';
-import {initializeModel} from "./utils/modelHelper";
-import ort from "onnxruntime-web";
+import {initializeModel, setBackendAndEnvFlags} from "./utils/modelHelper";
+import {STATE} from "./utils/pose-detection/params";
+import {createDetector, PoseDetector, SupportedModels} from "./utils/pose-detection";
 
 function App() {
+  const [detector, setDetector] = useState<PoseDetector | null>(null);
 
   useEffect(() => {
-    const makePrediction = async () => {
-      const session = await initializeModel();
+    const setupTF = async () => {
+      console.log('setting TF');
+      await setBackendAndEnvFlags(STATE.flags, STATE.backend as SupportedModels);
 
-      console.log(session.inputNames)
+      const newDetector = await createDetector(STATE.model, STATE.modelConfig);
 
-      const dataA = Float32Array.from(Array(512*512*3).fill(1));
-      const testTensor = new ort.Tensor(dataA,[1, 3, 512, 512]);
-
-      console.log(testTensor);
-
-      // const results = await session.run(testTensor);
+      setDetector(newDetector);
     }
 
-    makePrediction()
+    setupTF()
   }, [])
+
+  console.log(detector);
   return (
     <div className="App">
       <header className="App-header">
