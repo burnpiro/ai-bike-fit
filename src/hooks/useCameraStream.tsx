@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Ref } from "react";
 
 export interface useCameraStreamProps {
   audio: boolean;
@@ -10,8 +10,26 @@ export interface useCameraStreamProps {
   };
 }
 
+function stopMediaStream(stream: MediaStream | null) {
+  if (stream) {
+    if (stream.getVideoTracks && stream.getAudioTracks) {
+      stream.getVideoTracks().map((track) => {
+        stream.removeTrack(track);
+        track.stop();
+      });
+      stream.getAudioTracks().map((track) => {
+        stream.removeTrack(track);
+        track.stop();
+      });
+    } else {
+      (stream as unknown as MediaStreamTrack).stop();
+    }
+  }
+}
 
-export default function useCameraStream(props: useCameraStreamProps) {
+export default function useCameraStream(
+  props: useCameraStreamProps
+): Ref<MediaStream | undefined> {
   const mediaDeviceRef = useRef<MediaStream | undefined>();
 
   useEffect(() => {
@@ -20,6 +38,13 @@ export default function useCameraStream(props: useCameraStreamProps) {
     };
 
     awaitCamera();
+
+    return () => {
+      if (mediaDeviceRef.current) {
+        stopMediaStream(mediaDeviceRef.current);
+        mediaDeviceRef.current = undefined;
+      }
+    };
   }, [props]);
 
   return mediaDeviceRef;
