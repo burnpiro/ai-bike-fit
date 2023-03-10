@@ -1,0 +1,19 @@
+<svg version='1.1' viewbox='0 0 1000 77' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns='http://www.w3.org/2000/svg'>
+    <defs>
+        <lineargradient id='linearGradient-1' x1='50%' x2='50%' y1='0%' y2='100%'>
+            <stop offset='0%' stop-color='#B2F85A'></stop>
+            <stop offset='46.4465083%' stop-color='#E6FFC7'></stop>
+            <stop offset='100%' stop-color='#B4F661'></stop>
+        </lineargradient>
+    </defs>
+    <g id='water_level'>
+        <rect fill='url(#linearGradient-1)' height='77' id='Water' stroke-width='2' stroke='#E0DDDD' width='1000' x='0' y='0'></rect>
+        <g fill='#FFFFFF' id='Bubble' stroke='#979797' transform='translate(455, 1.000000)'>
+            <path d='M45.0879765,33 C69.9893784,33 90.1759531,22.6116071 90.1759531,9.796875 C90.1759531,-3.01785709 69.9893784,0.584773242 45.0879765,0.584773242 C20.1865747,0.584773242 0,-3.01785709 0,9.796875 C0,22.6116071 20.1865747,33 45.0879765,33 Z' id='Oval-1'></path>
+        </g>
+        <g id='MiddleLine' stroke-linecap='square' stroke-width='4' stroke='#000000' transform='translate(437.683284, 4.000000)'>
+            <path d='M124.633431,0 L124.633431,70' id='Line'></path>
+            <path d='M0.73313783,0 L0.73313783,70' id='Line-2'></path>
+        </g>
+    </g>
+</svg>
