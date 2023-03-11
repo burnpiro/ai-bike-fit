@@ -22,6 +22,8 @@ export default function BubbleLevelTool({
   correctRange = [-0.05, 0.05], // min and maximum tilt as % of 90deg
   width = 200,
   height = 25,
+  sx,
+  ...other
 }: BubbleLevelToolProps) {
   const orientation = useDeviceOrientation();
 
@@ -58,7 +60,7 @@ export default function BubbleLevelTool({
   }
 
   return (
-    <Box sx={{ width }}>
+    <Box {...other} sx={{ width, ...sx }}>
       <svg
         version="1.1"
         viewBox={`0 0 ${width} ${height}`}
@@ -84,10 +86,15 @@ export default function BubbleLevelTool({
             height={height}
             id="Water"
             strokeWidth="2"
-            stroke="#E0DDDD"
+            stroke={
+              sinBeta > correctRange[0] && sinBeta < correctRange[1]
+                ? "#E0DDDD"
+                : "#FFA48D"
+            }
             width={width}
             x="0"
             y="0"
+            rx="10"
           ></rect>
           <g
             fill="#FFFFFF"
@@ -108,7 +115,9 @@ export default function BubbleLevelTool({
           <g
             id="MiddleLine"
             strokeLinecap="square"
-            strokeWidth="3"
+            strokeWidth={
+              sinBeta > correctRange[0] && sinBeta < correctRange[1] ? "3" : "4"
+            }
             stroke={`${
               sinBeta > correctRange[0] && sinBeta < correctRange[1]
                 ? "green"
