@@ -1,6 +1,7 @@
 import useDeviceOrientation from "../../hooks/useDeviceOrientation";
 import { Box, BoxProps } from "@mui/material";
 import Quaternion from "quaternion";
+import { useEffect } from "react";
 
 const orientations = [
   ["landscape left", "landscape right"], // device x axis points up/down
@@ -8,38 +9,55 @@ const orientations = [
   ["display up", "display down"], // device z axis points up/down
 ];
 
+enum Orientation {
+  landscape,
+  portrait,
+}
+
 const rad = Math.PI / 180;
 
 // ----------------------------------------------------------------------
 
 interface BubbleLevelToolProps extends BoxProps {
   onLevel?: () => void;
+  orientation?: Orientation;
   correctRange?: [number, number];
   width?: number;
   height?: number;
 }
 export default function BubbleLevelTool({
+  onLevel,
+  orientation = Orientation.landscape,
   correctRange = [-0.05, 0.05], // min and maximum tilt as % of 90deg
   width = 200,
   height = 25,
   sx,
   ...other
 }: BubbleLevelToolProps) {
-  const orientation = useDeviceOrientation();
+  const deviceOrientation = useDeviceOrientation();
 
-  const sinBeta = orientation.beta
-    ? Math.sin(((orientation.beta * 2) / 360) * Math.PI)
-    : 0;
+  const sinAngle =
+    orientation === Orientation.landscape
+      ? deviceOrientation.beta
+        ? Math.sin(((deviceOrientation.beta * 2) / 360) * Math.PI)
+        : 0
+      : deviceOrientation.beta
+      ? Math.cos(((deviceOrientation.beta * 2) / 360) * Math.PI)
+      : 0;
 
   let bubbleOrientation = 1;
 
   let devOrientation = "";
 
-  if (orientation.alpha && orientation.beta && orientation.gamma) {
+  if (
+    deviceOrientation.alpha &&
+    deviceOrientation.beta &&
+    deviceOrientation.gamma
+  ) {
     const q = Quaternion.fromEuler(
-      orientation.alpha * rad,
-      orientation.beta * rad,
-      orientation.gamma * rad,
+      deviceOrientation.alpha * rad,
+      deviceOrientation.beta * rad,
+      deviceOrientation.gamma * rad,
       "ZXY"
     );
 
@@ -54,10 +72,20 @@ export default function BubbleLevelTool({
 
     devOrientation = orientations[axis][Number(value < 0)];
 
-    if (devOrientation === "landscape left") {
+    if (
+      (orientation === Orientation.landscape &&
+        devOrientation === "landscape left") ||
+      (orientation === Orientation.portrait && devOrientation === "portrait")
+    ) {
       bubbleOrientation = -1;
     }
   }
+
+  useEffect(() => {
+    if (sinAngle > correctRange[0] && sinAngle < correctRange[1] && onLevel) {
+      onLevel();
+    }
+  }, [sinAngle]);
 
   return (
     <Box {...other} sx={{ width, ...sx }}>
@@ -87,7 +115,7 @@ export default function BubbleLevelTool({
             id="Water"
             strokeWidth="2"
             stroke={
-              sinBeta > correctRange[0] && sinBeta < correctRange[1]
+              sinAngle > correctRange[0] && sinAngle < correctRange[1]
                 ? "#E0DDDD"
                 : "#FFA48D"
             }
@@ -103,7 +131,7 @@ export default function BubbleLevelTool({
             transform={`translate(${
               width / 2 -
               width / 7 / 2 +
-              (sinBeta * bubbleOrientation * width) / 2
+              (sinAngle * bubbleOrientation * width) / 2
             }, 1.000000)`}
           >
             <path
@@ -116,10 +144,12 @@ export default function BubbleLevelTool({
             id="MiddleLine"
             strokeLinecap="square"
             strokeWidth={
-              sinBeta > correctRange[0] && sinBeta < correctRange[1] ? "3" : "4"
+              sinAngle > correctRange[0] && sinAngle < correctRange[1]
+                ? "3"
+                : "4"
             }
             stroke={`${
-              sinBeta > correctRange[0] && sinBeta < correctRange[1]
+              sinAngle > correctRange[0] && sinAngle < correctRange[1]
                 ? "green"
                 : "red"
             }`}
