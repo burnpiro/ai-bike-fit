@@ -3,6 +3,10 @@ import { alpha } from '@mui/material';
 // ----------------------------------------------------------------------
 
 // SETUP COLORS
+const BACKGROUND = {
+    DEFAULT: '#121212'
+}
+
 const GREY = {
     0: '#FFFFFF',
     100: '#F9FAFB',
@@ -17,61 +21,67 @@ const GREY = {
 };
 
 const PRIMARY = {
-    lighter: '#D1E9FC',
-    light: '#76B0F1',
-    main: '#2065D1',
-    dark: '#103996',
-    darker: '#061B64',
-    contrastText: '#fff',
+    lighter: '#EDF4FD',
+    light: '#D1E9FC',
+    main: '#76B0F1',
+    dark: '#2065D1',
+    darker: '#103996',
+    // darkest: '#061B64',
+    contrastText: GREY[800],
 };
 
 const SECONDARY = {
-    lighter: '#D6E4FF',
-    light: '#84A9FF',
-    main: '#3366FF',
-    dark: '#1939B7',
-    darker: '#091A7A',
-    contrastText: '#fff',
+    lighter: '#fceedd',
+    light: '#f7d4ab',
+    main: '#f1b876',
+    dark: '#e78718',
+    darker: '#de6800',
+    // darkest: '#091A7A',
+    contrastText: GREY[800],
 };
 
 const INFO = {
-    lighter: '#D0F2FF',
-    light: '#74CAFF',
-    main: '#1890FF',
-    dark: '#0C53B7',
-    darker: '#04297A',
-    contrastText: '#fff',
+    lighter: '#EBF7FF',
+    light: '#D0F2FF',
+    main: '#74CAFF',
+    dark: '#1890FF',
+    darker: '#0C53B7',
+    // darkest: '#04297A',
+    contrastText: GREY[800],
 };
 
 const SUCCESS = {
-    lighter: '#E9FCD4',
-    light: '#AAF27F',
-    main: '#54D62C',
-    dark: '#229A16',
-    darker: '#08660D',
+    lighter: '#F3FDEC',
+    light: '#E9FCD4',
+    main: '#AAF27F',
+    dark: '#54D62C',
+    darker: '#229A16',
+    // darkest: '#08660D',
     contrastText: GREY[800],
 };
 
 const WARNING = {
-    lighter: '#FFF7CD',
-    light: '#FFE16A',
-    main: '#FFC107',
-    dark: '#B78103',
-    darker: '#7A4F01',
+    lighter: '#FFFBEB',
+    light: '#FFF7CD',
+    main: '#FFE16A',
+    dark: '#FFC107',
+    darker: '#B78103',
+    // darkest: '#7A4F01',
     contrastText: GREY[800],
 };
 
 const ERROR = {
-    lighter: '#FFE7D9',
-    light: '#FFA48D',
-    main: '#FF4842',
-    dark: '#B72136',
-    darker: '#7A0C2E',
-    contrastText: '#fff',
+    lighter: '#FFEFEB',
+    light: '#FFE7D9',
+    main: '#FFA48D',
+    dark: '#FF4842',
+    darker: '#B72136',
+    // darkest: '#7A0C2E',
+    contrastText: GREY[800],
 };
 
 const palette = {
-    common: { black: '#000', white: '#fff' },
+    common: { black: '#000', white: GREY[0] },
     primary: PRIMARY,
     secondary: SECONDARY,
     info: INFO,
@@ -79,24 +89,26 @@ const palette = {
     warning: WARNING,
     error: ERROR,
     grey: GREY,
-    divider: alpha(GREY[500], 0.24),
+    divider: alpha(GREY[0], 0.14),
     text: {
-        primary: GREY[800],
-        secondary: GREY[600],
-        disabled: GREY[500],
+        primary: GREY[0],
+        secondary: alpha(GREY[0], 0.7),
+        disabled: alpha(GREY[0], 0.5),
+        icon: alpha(GREY[0], 0.5),
     },
     background: {
-        paper: '#fff',
-        default: GREY[100],
-        neutral: GREY[200],
+        paper: BACKGROUND.DEFAULT,
+        default: BACKGROUND.DEFAULT,
+        neutral: GREY[700],
+        light: GREY[400],
     },
     action: {
-        active: GREY[600],
-        hover: alpha(GREY[500], 0.08),
-        selected: alpha(GREY[500], 0.16),
-        disabled: alpha(GREY[500], 0.8),
-        disabledBackground: alpha(GREY[500], 0.24),
-        focus: alpha(GREY[500], 0.24),
+        active: GREY[0],
+        hover: alpha(GREY[0], 0.08),
+        selected: alpha(GREY[0], 0.16),
+        disabled: alpha(GREY[0], 0.8),
+        disabledBackground: alpha(GREY[0], 0.24),
+        focus: alpha(GREY[0], 0.24),
         hoverOpacity: 0.08,
         disabledOpacity: 0.48,
     },
