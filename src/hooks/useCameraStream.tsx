@@ -29,23 +29,27 @@ function stopMediaStream(stream: MediaStream | null) {
 
 export default function useCameraStream(
   props: useCameraStreamProps
-): Ref<MediaStream | undefined> {
+): MediaStream | undefined {
   const mediaDeviceRef = useRef<MediaStream | undefined>();
 
   useEffect(() => {
     const awaitCamera = async () => {
-      mediaDeviceRef.current = await navigator.mediaDevices.getUserMedia(props);
+      const mediaDevice = await navigator.mediaDevices.getUserMedia(props);
+      console.log(mediaDevice)
+      mediaDeviceRef.current = mediaDevice;
     };
+
+    console.log(props)
 
     awaitCamera();
 
-    return () => {
-      if (mediaDeviceRef.current) {
-        stopMediaStream(mediaDeviceRef.current);
-        mediaDeviceRef.current = undefined;
-      }
-    };
+    // return () => {
+    //   if (mediaDeviceRef.current) {
+    //     stopMediaStream(mediaDeviceRef.current);
+    //     mediaDeviceRef.current = undefined;
+    //   }
+    // };
   }, [props]);
 
-  return mediaDeviceRef;
+  return mediaDeviceRef.current;
 }
