@@ -4,7 +4,8 @@ import { alpha } from '@mui/material';
 
 // SETUP COLORS
 const BACKGROUND = {
-    DEFAULT: '#121212'
+    DEFAULT: '#212121',
+    PAPER: '#424242'
 }
 
 const GREY = {
@@ -97,7 +98,7 @@ const palette = {
         icon: alpha(GREY[0], 0.5),
     },
     background: {
-        paper: BACKGROUND.DEFAULT,
+        paper: BACKGROUND.PAPER,
         default: BACKGROUND.DEFAULT,
         neutral: GREY[700],
         light: GREY[400],

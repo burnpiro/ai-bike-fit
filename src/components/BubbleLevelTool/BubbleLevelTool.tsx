@@ -103,9 +103,9 @@ export default function BubbleLevelTool({
             y1="0%"
             y2="100%"
           >
-            <stop offset="0%" stopColor="#B2F85A"></stop>
-            <stop offset="46.4465083%" stopColor="#E6FFC7"></stop>
-            <stop offset="100%" stopColor="#B4F661"></stop>
+            <stop offset="0%" stopColor="#54D62C"></stop>
+            <stop offset="46.4465083%" stopColor="#AAF27F"></stop>
+            <stop offset="100%" stopColor="#54D62C"></stop>
           </linearGradient>
         </defs>
         <g id="water_level">
@@ -116,8 +116,8 @@ export default function BubbleLevelTool({
             strokeWidth="2"
             stroke={
               sinAngle > correctRange[0] && sinAngle < correctRange[1]
-                ? "#E0DDDD"
-                : "#FFA48D"
+                ? "#454F5B"
+                : "#454F5B"
             }
             width={width}
             x="0"
@@ -150,8 +150,8 @@ export default function BubbleLevelTool({
             }
             stroke={`${
               sinAngle > correctRange[0] && sinAngle < correctRange[1]
-                ? "green"
-                : "red"
+                ? "#08660D"
+                : "#FF4842"
             }`}
             transform={`translate(${width / 2 - width / 7 / 2}, 1.000000)`}
           >
