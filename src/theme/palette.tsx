@@ -101,7 +101,7 @@ const palette = {
         paper: BACKGROUND.PAPER,
         default: BACKGROUND.DEFAULT,
         neutral: GREY[700],
-        light: GREY[400],
+        light: GREY[200],
     },
     action: {
         active: GREY[0],

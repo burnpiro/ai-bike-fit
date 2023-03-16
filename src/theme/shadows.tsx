@@ -3,7 +3,7 @@ import {alpha, Shadows} from "@mui/material";
 
 // ----------------------------------------------------------------------
 
-const color = palette.grey[500];
+const color = palette.grey[600];
 
 export default function shadows(): Shadows {
     const transparent1 = alpha(color, 0.2);
