@@ -9,6 +9,7 @@ import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
 
 interface IconifyProps extends BoxProps {
   icon: string | ReactJSXElement;
+  width?: number;
 }
 
 const Iconify = forwardRef(
