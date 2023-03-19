@@ -1,0 +1,28 @@
+.StackContainer {
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
+.StackContainer .StackContainer-Menu {
+  height: 100px;
+  width: 100%;
+  flex-direction: row-reverse;
+  position: relative;
+  justify-content: space-evenly;
+  align-items: self-end;
+}
+
+@media screen and (orientation: landscape) {
+  .StackContainer {
+    flex-direction: row;
+    width: auto;
+    height: 100%;
+  }
+
+  .StackContainer .StackContainer-Menu {
+    flex-direction: column;
+    height: 100%;
+    width: 100px;
+  }
+}
