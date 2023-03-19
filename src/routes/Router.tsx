@@ -4,7 +4,7 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import BasicLayout from "../layouts/BasicLayout";
 //
 import Page404 from "../pages/404Page";
-import RecordVideoPage from "../pages/RecordVideoPage";
+import RecordSessionPage from "../pages/RecordSession";
 import SessionsPage from "../pages/SessionsPage";
 import FAQPage from "../pages/FAQPage";
 
@@ -18,7 +18,7 @@ export function Router() {
             children: [
                 { element: <Navigate to="/dashboard/app" />, index: true },
                 { path: "app", element: <SessionsPage /> },
-                { path: "record", element: <RecordVideoPage /> },
+                { path: "record", element: <RecordSessionPage /> },
                 { path: "faq", element: <FAQPage /> },
                 { path: "support", element: <div /> },
             ],
