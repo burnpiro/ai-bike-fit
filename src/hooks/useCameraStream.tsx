@@ -10,6 +10,13 @@ export interface useCameraStreamProps {
   };
 }
 
+const emptyVideoSettings: useCameraStreamProps["video"] = {
+  facingMode: "user",
+  frameRate: { ideal: 30 },
+  width: 0,
+  height: 0,
+};
+
 function stopMediaStream(stream: MediaStream | null) {
   if (stream) {
     if (stream.getVideoTracks && stream.getAudioTracks) {
@@ -31,17 +38,24 @@ export default function useCameraStream(
   props: useCameraStreamProps
 ): MediaStream | undefined {
   const mediaDeviceRef = useRef<MediaStream | undefined>();
+  const [prevCameraSettings, setPrevCameraSettings] =
+    useState<useCameraStreamProps["video"]>(emptyVideoSettings);
 
   useEffect(() => {
     const awaitCamera = async () => {
       const mediaDevice = await navigator.mediaDevices.getUserMedia(props);
-      console.log(mediaDevice)
       mediaDeviceRef.current = mediaDevice;
+      setPrevCameraSettings(props.video);
     };
 
-    console.log(props)
-
-    awaitCamera();
+    if (
+      prevCameraSettings.height !== props.video.height ||
+      prevCameraSettings.width !== props.video.width ||
+      prevCameraSettings.facingMode !== props.video.facingMode ||
+      prevCameraSettings.frameRate.ideal !== props.video.frameRate.ideal
+    ) {
+      awaitCamera();
+    }
 
     // return () => {
     //   if (mediaDeviceRef.current) {
