@@ -1,1 +1,2 @@
-export { default } from "./PhoneOrientationChange/PhoneOrientationChange";
+export * from "./PhoneOrientationChange/PhoneOrientationChange";
+export * from "./RecordingTimer/RecordingTimer";
