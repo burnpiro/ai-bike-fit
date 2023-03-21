@@ -6,7 +6,7 @@ interface PhoneOrientationChangeProps {
   message?: string;
 }
 
-export default function PhoneOrientationChange({
+export function PhoneOrientationChange({
   message = "Please rotate your device",
 }: PhoneOrientationChangeProps) {
   return (
