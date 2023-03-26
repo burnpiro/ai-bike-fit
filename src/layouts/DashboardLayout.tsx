@@ -44,7 +44,7 @@ export default function DashboardLayout() {
 
       <Navigation openNav={open} onCloseNav={() => setOpen(false)} />
 
-      <Main justifyContent={"center"}>
+      <Main justifyContent={"start"}>
         <Outlet />
       </Main>
     </StyledRoot>
