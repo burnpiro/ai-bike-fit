@@ -1,11 +1,15 @@
 .StackContainer {
   flex-direction: column;
   justify-content: center;
+  max-height: calc(var(--vh, 1vh) * 100);
+  max-width: calc(var(--vw, 1vw) * 100);
   width: 100%;
 }
 
 .StackContainer .StackContainer-Menu {
   height: 100px;
+  max-height: calc(var(--vh, 1vh) * 100);
+  max-width: calc(var(--vw, 1vw) * 100);
   width: 100%;
   flex-direction: row-reverse;
   position: relative;
