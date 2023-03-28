@@ -38,7 +38,7 @@ function CameraVerticalPositionSetupPage({
           <div
             style={{
               width: 8,
-              height: "60vh",
+              height: "calc(var(--vh, 1vh) * 60)",
               backgroundColor: "white",
               position: "relative",
             }}
@@ -57,7 +57,7 @@ function CameraVerticalPositionSetupPage({
         </Stack>
         <img
           src={"/assets/images/back-bicycle.png"}
-          style={{ height: "60vh" }}
+          style={{ height: "calc(var(--vh, 1vh) * 60)" }}
         />
       </Stack>
       <Typography sx={{ pl: 4, pr: 4, textAlign: "center" }}>

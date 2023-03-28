@@ -37,7 +37,7 @@ function CameraHorizontalPositionSetupPage({
           <div
             style={{
               marginTop: 24,
-              width: "30vw",
+              width: "calc(var(--vw, 1vw) * 30)",
               height: "1vh",
               backgroundColor: "white",
               position: "relative",
@@ -57,7 +57,7 @@ function CameraHorizontalPositionSetupPage({
         </Stack>
         <img
           src={"/assets/images/top-bicycle.png"}
-          style={{ height: "60vh" }}
+          style={{ height: "calc(var(--vh, 1vh) * 60)" }}
         />
       </Stack>
       <Typography sx={{ pl: 4, pr: 4, textAlign: "center" }}>
