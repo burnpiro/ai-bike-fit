@@ -16,7 +16,7 @@ interface RecordingControlsProps {
   onRecordClicked: () => void;
 }
 
-const DELAYS = [10, 20, 30, 60];
+export const DELAYS = [1, 10, 20, 30, 60];
 
 function RecordingControls({
   isRecording,
@@ -78,7 +78,6 @@ function RecordingControls({
           />
         }
         direction={"left"}
-        open={isRecording ? false : undefined}
       >
         {DELAYS.map((elDelay) => (
           <SpeedDialAction

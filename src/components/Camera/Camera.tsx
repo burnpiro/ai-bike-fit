@@ -43,6 +43,7 @@ function Camera(props: CameraProps) {
       const awaitVideo = async () => {
         if (videoRef.current) {
           videoRef.current.srcObject = cameraStreamRef;
+          console.log('set src')
           await new Promise((resolve) => {
             if (videoRef.current) {
               videoRef.current.onloadedmetadata = () => {
@@ -67,13 +68,21 @@ function Camera(props: CameraProps) {
     }
   }, [cameraStreamRef]);
 
-  return cameraStreamRef ? (
+  return (
     <Box className="videoContainer">
-      <video ref={videoRef} className="videoContainer_media" />
-    </Box>
-  ) : (
-    <Box className="loadingContainer">
-      <span>Loading camera...</span>
+      <video
+        ref={videoRef}
+        className="videoContainer_media"
+        width={640}
+        height={480}
+      />
+      {!cameraStreamRef && (
+        <Box
+          className="loadingContainer"
+        >
+          <span>Loading camera...</span>
+        </Box>
+      )}
     </Box>
   );
 }
