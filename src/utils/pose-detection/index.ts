@@ -34,6 +34,7 @@ export type {
 } from "./movenet/types";
 // PoseDetector class.
 export type { PoseDetector } from "./pose_detector";
+export * from "./filterPosition";
 
 // Supported models enum.
 export * from "./types";
