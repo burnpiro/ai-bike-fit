@@ -9,7 +9,7 @@ import { Button, Typography, Container, Box } from '@mui/material';
 const StyledContent = styled('div')(({ theme }) => ({
     maxWidth: 480,
     margin: 'auto',
-    minHeight: '100vh',
+    minHeight: 'calc(var(--vh, 1vh) * 100)',
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'column',
