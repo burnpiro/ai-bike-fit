@@ -1,74 +1,84 @@
-import React, { Fragment, useEffect, useState } from "react";
-import "@tensorflow/tfjs-backend-webgl";
-import {
-  initializeModel,
-  setBackendAndEnvFlags,
-} from "../../utils/modelHelper";
-import { STATE } from "../../utils/pose-detection/params";
-import {
-  createDetector,
-  PoseDetector,
-  SupportedModels,
-} from "../../utils/pose-detection";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import Camera, { CameraProps } from "../../components/Camera/Camera";
-import PhoneOrientationChange from "../../components/Messages";
 import useDeviceOrientation from "../../hooks/useDeviceOrientation";
 import BubbleLevelTool from "../../components/BubbleLevelTool";
-import Iconify from "../../components/Iconify";
-import {
-  Box,
-  SpeedDial,
-  SpeedDialAction,
-  SpeedDialIcon,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Stack } from "@mui/material";
 
 import "./RecordVideoPage.css";
-
-const videoConfig: CameraProps["cameraSettings"] = {
-  audio: false,
-  video: {
-    facingMode: "front",
-    frameRate: 30,
-    width: 640,
-    height: 480,
-  },
-};
+import useAudio from "../../hooks/useAudio";
+import {
+  RecordingTimer,
+  PhoneOrientationChange,
+} from "../../components/Messages";
+import RecordingControls, {
+  DELAYS,
+} from "../../components/Camera/RecordingControls";
+import {
+  RECORDING_TIME,
+  videoConfig,
+  videoOptions,
+} from "../../utils/constants";
 
 interface RecordVideoPageProps {
-  onPrev: () => void;
+  onNext: (recording: Blob[]) => void;
 }
 
-const DELAYS = [10, 20, 30];
-
-function RecordVideoPage({ onPrev }: RecordVideoPageProps) {
-  const [detector, setDetector] = useState<PoseDetector | null>(null);
-  const [delay, setDelay] = useState<number>(10);
+function RecordVideoPage({ onNext }: RecordVideoPageProps) {
+  const [delay, setDelay] = useState<number>(DELAYS[0]);
+  const [timer, setTimer] = useState<number>(0);
+  const [isRecording, setIsRecording] = useState<boolean>(false);
   const orientation = useDeviceOrientation();
+  const [recorderRef, setRecorderRef] = useState<MediaRecorder | null>(null);
+  const [startRecordingAudio] = useAudio("/assets/sounds/start-recording.mp3");
+  const [endRecordingAudio] = useAudio("/assets/sounds/end-recording.mp3");
 
-  useEffect(() => {
-    const setupTF = async () => {
-      console.log("setting TF");
-      await setBackendAndEnvFlags(
-        STATE.flags,
-        STATE.backend as SupportedModels
-      );
-
-      const newDetector = await createDetector(STATE.model, STATE.modelConfig);
-
-      setDetector(newDetector);
-    };
-
-    setupTF();
-  }, []);
+  const handleCameraStreamAvailable = (mediaStream: MediaStream) => {
+    if (mediaStream) {
+      setRecorderRef(new MediaRecorder(mediaStream, videoOptions));
+    }
+  };
 
   const changeDelay = (newDelay: number) => {
     setDelay(newDelay);
   };
 
-  // console.log(detector);
-  console.log(orientation);
+  const recordVideo = () => {
+    if (recorderRef) {
+      let chunks: Blob[] = [];
+      recorderRef.ondataavailable = (e) => {
+        chunks.push(e.data);
+      };
+      recorderRef.onstop = (e) => {
+        endRecordingAudio.play();
+        onNext(chunks);
+      };
+      const getStreamData = () => {
+        recorderRef.start();
+        setIsRecording(true);
+
+        setTimeout(() => {
+          recorderRef.stop();
+          setIsRecording(false);
+        }, RECORDING_TIME);
+      };
+
+      setTimeout(() => {
+        startRecordingAudio.addEventListener("ended", getStreamData);
+        startRecordingAudio.play();
+      }, delay * 1000);
+
+      const timerInterval = setInterval(() => {
+        setTimer((currTimer) => {
+          if (currTimer + 1 > delay) {
+            clearInterval(timerInterval);
+            return 0;
+          }
+          return currTimer + 1;
+        });
+      }, 1000);
+      console.log("recording");
+    }
+  };
   const isLandscape =
     orientation.beta == null ||
     Math.abs(orientation.beta) < 20 ||
@@ -80,95 +90,24 @@ function RecordVideoPage({ onPrev }: RecordVideoPageProps) {
         className={"StackContainer"}
         sx={{ backgroundColor: "common.black" }}
       >
-        <Camera cameraSettings={videoConfig} />
-        <Stack direction={"row"} className={"StackContainer-Menu"}>
-          <Box
-            sx={{
-              width: 64,
-              height: 64,
-              "@media screen and (orientation: portrait)": {
-                display: "none",
-              },
-            }}
-          />
-          <Iconify
-            icon={"ph:record-fill"}
-            sx={{
-              width: 64,
-              height: 64,
-            }}
-          />
-          <SpeedDial
-            ariaLabel="Select delay"
-            FabProps={{
-              size: "medium",
-              sx: {
-                bgcolor: "background.light",
-                "&:hover": {
-                  bgcolor: "background.light",
-                },
-              },
-            }}
-            sx={{
-              mr: 1,
-              mb: isLandscape ? 0 : 1,
+        <Camera
+          cameraSettings={videoConfig}
+          onCameraReady={handleCameraStreamAvailable}
+        />
 
-              "@media screen and (orientation: portrait)": {
-                display: "none",
-              },
-            }}
-            icon={
-              <Iconify
-                icon={"mingcute:stopwatch-line"}
-                sx={{
-                  width: 36,
-                  height: 36,
-                }}
-              />
-            }
-            direction={"left"}
-          >
-            {DELAYS.map((elDelay) => (
-              <SpeedDialAction
-                key={elDelay + "s"}
-                sx={{
-                  color: "#212B36",
-                }}
-                FabProps={{
-                  size: delay === elDelay ? "medium" : "small",
-                  sx: {
-                    mt: delay === elDelay ? "4px" : "8px",
-                    bgcolor:
-                      delay === elDelay
-                        ? "background.light"
-                        : "background.neutral",
-                    color: delay === elDelay ? "common.black" : "text.primary",
-                    "&:hover": {
-                      bgcolor:
-                        delay === elDelay
-                          ? "background.light"
-                          : "background.neutral",
-                    },
-                  },
-                }}
-                icon={
-                  <Typography sx={{ fontWeight: "bold" }}>
-                    {elDelay}s
-                  </Typography>
-                }
-                tooltipTitle={`${elDelay}s`}
-                onClick={() => {
-                  changeDelay(elDelay);
-                }}
-              />
-            ))}
-          </SpeedDial>
-        </Stack>
+        <RecordingControls
+          isLandscape={isLandscape}
+          delay={delay}
+          isRecording={isRecording}
+          onDelayChange={changeDelay}
+          onRecordClicked={recordVideo}
+        />
+        <BubbleLevelTool
+          sx={{ position: "absolute", top: "2vh", right: "1vw" }}
+        />
+        {!isLandscape && <PhoneOrientationChange />}
+        {timer > 0 && <RecordingTimer time={delay - timer} />}
       </Stack>
-      <BubbleLevelTool
-        sx={{ position: "absolute", top: "2vh", right: "1vw" }}
-      />
-      {!isLandscape && <PhoneOrientationChange />}
     </Fragment>
   );
 }
