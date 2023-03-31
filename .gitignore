@@ -28,3 +28,4 @@ dist-ssr
 /public/group1-shard3of3.bin
 /public/group1-shard2of3.bin
 /public/group1-shard1of3.bin
+*.pem
