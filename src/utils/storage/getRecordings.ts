@@ -7,8 +7,6 @@ export function getRecordings(): Promise<Session[]> {
   return new Promise((resolve, reject) => {
     keys()
       .then((keys) => {
-        console.log(keys);
-
         const sessionKeys = keys.filter(
           (key) => !isRecordingRegex.test(key.toString())
         );
@@ -20,6 +18,16 @@ export function getRecordings(): Promise<Session[]> {
             );
           })
           .catch((e) => reject(e));
+      })
+      .catch((e) => reject(e));
+  });
+}
+
+export function getSession(id: IDBValidKey | string): Promise<Session> {
+  return new Promise((resolve, reject) => {
+    get(id)
+      .then((session) => {
+        resolve(new Session(session));
       })
       .catch((e) => reject(e));
   });
