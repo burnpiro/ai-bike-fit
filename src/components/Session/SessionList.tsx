@@ -21,7 +21,7 @@ export default function SessionList({ sessions, ...other }: SessionListProps) {
     <Fragment>
       {dates.map((date) => (
         <Fragment key={date}>
-          <Typography variant="h4" component="h3" sx={{ p: 2 }}>
+          <Typography id={date} variant="h4" component="h3" sx={{ p: 2 }}>
             {date}
           </Typography>
 
