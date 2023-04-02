@@ -1,15 +1,17 @@
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
-import { PoseWithTimestamp } from "./types";
-import { KEYPOINT_NAMES } from "./pose-detection/constants";
-import { filterPosition } from "./pose-detection";
+import {PoseWithTimestamp} from "./types";
+import {KEYPOINT_NAMES} from "./pose-detection/constants";
+import {filterPosition} from "./pose-detection";
+import {FaceDirection} from "./constants";
+
 dayjs.extend(localizedFormat);
 
 export type SessionData = {
   timestamp: number;
   bicycle?: string;
   image?: string;
-  faceDirection?: "left" | "right";
+  faceDirection?: FaceDirection;
   poses?: PoseWithTimestamp[];
   lowAnklePos?: PoseWithTimestamp;
   highAnklePos?: PoseWithTimestamp;
@@ -22,7 +24,7 @@ export class Session {
   id: string;
   bicycle?: string;
   image?: string;
-  faceDirection?: "left" | "right";
+  faceDirection?: FaceDirection;
   lowAnklePos?: PoseWithTimestamp;
   highAnklePos?: PoseWithTimestamp;
   forwardAnklePos?: PoseWithTimestamp;
@@ -71,22 +73,22 @@ export class Session {
       (pose) => pose.name === KEYPOINT_NAMES.LEFT_WRIST
     );
 
-    this.faceDirection = "left";
+    this.faceDirection = FaceDirection.LEFT;
     if (rightAnklePosition?.score && leftAnklePosition?.score) {
       if (rightAnklePosition.score > leftAnklePosition.score) {
         if (rightAnklePosition.x < (rightWristPosition?.x || 0)) {
-          this.faceDirection = "right";
+          this.faceDirection = FaceDirection.RIGHT;
         }
       } else {
         if (leftAnklePosition.x < (leftWristPosition?.x || 0)) {
-          this.faceDirection = "right";
+          this.faceDirection = FaceDirection.RIGHT;
         }
       }
     }
 
     this.lowAnklePos = filterPosition(
       newPoses,
-      this.faceDirection === "left"
+      this.faceDirection === FaceDirection.LEFT
         ? KEYPOINT_NAMES.LEFT_ANKLE
         : KEYPOINT_NAMES.RIGHT_ANKLE,
       (a, b) => a.y > b.y
@@ -94,7 +96,7 @@ export class Session {
 
     this.highAnklePos = filterPosition(
       newPoses,
-      this.faceDirection === "left"
+      this.faceDirection === FaceDirection.LEFT
         ? KEYPOINT_NAMES.LEFT_ANKLE
         : KEYPOINT_NAMES.RIGHT_ANKLE,
       (a, b) => a.y < b.y
@@ -102,10 +104,10 @@ export class Session {
 
     this.forwardAnklePos = filterPosition(
       newPoses,
-      this.faceDirection === "left"
+      this.faceDirection === FaceDirection.LEFT
         ? KEYPOINT_NAMES.LEFT_ANKLE
         : KEYPOINT_NAMES.RIGHT_ANKLE,
-      this.faceDirection === "left" ? (a, b) => a.x < b.x : (a, b) => a.x > b.x
+      this.faceDirection === FaceDirection.LEFT ? (a, b) => a.x < b.x : (a, b) => a.x > b.x
     );
   }
 
