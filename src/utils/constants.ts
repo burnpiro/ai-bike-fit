@@ -36,3 +36,5 @@ export enum AVAILABLE_POSITIONS {
   TOP = "highAnklePos",
   FRONT = "forwardAnklePos",
 }
+
+export const MAX_TOUCH_DISTANCE_TO_POINT = 32;

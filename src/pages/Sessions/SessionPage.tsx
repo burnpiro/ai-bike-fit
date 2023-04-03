@@ -12,6 +12,7 @@ import ResultImage from "../../components/Session/ResultImage";
 import PositionCanvas from "../../components/Session/PositionCanvas";
 import SessionPositionsDrawer from "../../components/Session/SessionPositionsDrawer";
 import { PoseWithTimestamp } from "../../utils/types";
+import { Keypoint } from "../../utils/pose-detection";
 
 function SessionPage() {
   let { id } = useParams<"id">();
@@ -20,6 +21,8 @@ function SessionPage() {
   const [currPosition, setCurrPosition] = useState<AVAILABLE_POSITIONS>(
     AVAILABLE_POSITIONS.TOP
   );
+  const [positions, setPositions] =
+    useState<Record<AVAILABLE_POSITIONS, PoseWithTimestamp>>();
 
   useEffect(() => {
     if (id) {
@@ -31,6 +34,16 @@ function SessionPage() {
           );
           setSession(idbSession);
           setRecording(idbRecording);
+          setPositions(
+            Object.values(AVAILABLE_POSITIONS).reduce<
+              Record<AVAILABLE_POSITIONS, PoseWithTimestamp> | any
+            >((acc, position) => {
+              if (idbSession[position]) {
+                acc[position] = idbSession[position];
+              }
+              return acc;
+            }, {})
+          );
         } catch (e) {
           console.error(e);
         }
@@ -46,6 +59,25 @@ function SessionPage() {
     }
   };
 
+  const handleKeypointChange = (keypoint: Keypoint) => {
+    if (positions) {
+      const newKeypoints = positions[currPosition].pose.keypoints.map((el) =>
+        el.name === keypoint.name ? { ...keypoint } : el
+      );
+
+      setPositions({
+        ...positions,
+        [currPosition]: {
+          ...positions[currPosition],
+          pose: {
+            ...positions[currPosition].pose,
+            keypoints: newKeypoints,
+          },
+        },
+      });
+    }
+  };
+
   return (
     <Stack sx={{ height: "100%", width: "100%", position: "relative" }}>
       {recording && session && currPosition && (
@@ -56,17 +88,18 @@ function SessionPage() {
           onPositionSelect={handlePositionChange}
         />
       )}
-      {recording && session && currPosition && (
+      {recording && session && currPosition && positions && (
         <ResultImage
           session={session}
           recording={recording}
-          position={session[currPosition] as PoseWithTimestamp}
+          position={positions[currPosition]}
         />
       )}
-      {recording && session && currPosition && (
+      {recording && session && currPosition && positions && (
         <PositionCanvas
-          points={(session[currPosition] as PoseWithTimestamp).pose.keypoints}
+          points={positions[currPosition].pose.keypoints}
           faceDirection={session.faceDirection as FaceDirection}
+          onKeypointChange={handleKeypointChange}
         />
       )}
       {(!recording || !session) && (

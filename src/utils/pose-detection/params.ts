@@ -17,7 +17,7 @@ import { SupportedModels } from "./types";
  * =============================================================================
  */
 export const DEFAULT_LINE_WIDTH = 2;
-export const DEFAULT_RADIUS = 2;
+export const DEFAULT_RADIUS = 3;
 
 export const MODEL_BACKEND_MAP = {
   [SupportedModels.MoveNet]: ["tfjs-webgl"],

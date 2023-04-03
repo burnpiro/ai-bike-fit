@@ -156,13 +156,10 @@ export default function SessionPositionsDrawer({
                   position === availablePosition ? "4px solid grey" : "none",
                 borderRadius: "5px",
               }}
-              variant={
-                position === availablePosition ? "outlined" : "elevation"
-              }
               onClick={() => handlePositionSelect(availablePosition)}
             >
               {imageUrls && imageUrls[availablePosition] && (
-                <img src={imageUrls[availablePosition]} />
+                <img alt={availablePosition} src={imageUrls[availablePosition]} />
               )}
               {(!imageUrls || !imageUrls[availablePosition]) && (
                 <Skeleton variant={"rectangular"} height={130} />

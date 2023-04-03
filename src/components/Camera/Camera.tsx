@@ -4,6 +4,7 @@ import useCameraStream, {
 } from "../../hooks/useCameraStream";
 import "./Camera.css";
 import { Box } from "@mui/material";
+import {videoConfig} from "../../utils/constants";
 
 export interface CameraProps {
   cameraSettings: {
@@ -53,8 +54,8 @@ function Camera(props: CameraProps) {
           });
           videoRef.current.play();
 
-          videoRef.current.width = 640;
-          videoRef.current.height = 480;
+          videoRef.current.width = videoConfig.video.width;
+          videoRef.current.height = videoConfig.video.height;
         }
       };
 
@@ -73,8 +74,8 @@ function Camera(props: CameraProps) {
       <video
         ref={videoRef}
         className="videoContainer_media"
-        width={640}
-        height={480}
+        width={videoConfig.video.width}
+        height={videoConfig.video.height}
       />
       {!cameraStreamRef && (
         <Box
