@@ -1,23 +1,25 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Session } from "../../utils/session";
 import { getRecording, getSession } from "../../utils/storage";
-import { FaceDirection, RECORDING_POSTFIX } from "../../utils/constants";
+import {
+  AVAILABLE_POSITIONS,
+  FaceDirection,
+  RECORDING_POSTFIX,
+} from "../../utils/constants";
 import { Skeleton, Stack } from "@mui/material";
 import ResultImage from "../../components/Session/ResultImage";
-import { PoseWithTimestamp } from "../../utils/types";
 import PositionCanvas from "../../components/Session/PositionCanvas";
+import SessionPositionsDrawer from "../../components/Session/SessionPositionsDrawer";
+import { PoseWithTimestamp } from "../../utils/types";
 
-enum AVAILABLE_POSITIONS {
-  BOTTOM = "lowAnklePos",
-  TOP = "highAnklePos",
-  FRONT = "forwardAnklePos",
-}
 function SessionPage() {
   let { id } = useParams<"id">();
   const [recording, setRecording] = useState<Blob | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [currPosition, setCurrPosition] = useState<PoseWithTimestamp>();
+  const [currPosition, setCurrPosition] = useState<AVAILABLE_POSITIONS>(
+    AVAILABLE_POSITIONS.TOP
+  );
 
   useEffect(() => {
     if (id) {
@@ -29,7 +31,6 @@ function SessionPage() {
           );
           setSession(idbSession);
           setRecording(idbRecording);
-          setCurrPosition(idbSession[AVAILABLE_POSITIONS.TOP]);
         } catch (e) {
           console.error(e);
         }
@@ -39,18 +40,32 @@ function SessionPage() {
     }
   }, [id]);
 
+  const handlePositionChange = (newPosition: AVAILABLE_POSITIONS) => {
+    if (session && session[newPosition]) {
+      setCurrPosition(newPosition);
+    }
+  };
+
   return (
-    <Stack>
+    <Stack sx={{ height: "100%", width: "100%", position: "relative" }}>
+      {recording && session && currPosition && (
+        <SessionPositionsDrawer
+          session={session}
+          recording={recording}
+          position={currPosition}
+          onPositionSelect={handlePositionChange}
+        />
+      )}
       {recording && session && currPosition && (
         <ResultImage
           session={session}
           recording={recording}
-          position={currPosition}
+          position={session[currPosition] as PoseWithTimestamp}
         />
       )}
       {recording && session && currPosition && (
         <PositionCanvas
-          points={currPosition?.pose.keypoints}
+          points={(session[currPosition] as PoseWithTimestamp).pose.keypoints}
           faceDirection={session.faceDirection as FaceDirection}
         />
       )}
