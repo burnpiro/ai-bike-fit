@@ -8,6 +8,7 @@ import { PoseWithTimestamp } from "../../utils/types";
 import { STATE } from "../../utils/pose-detection/params";
 import { setMany } from "idb-keyval";
 import { RECORDING_POSTFIX } from "../../utils/constants";
+import { extractFrameFromRecording } from "../../utils/imageHelper";
 
 // ----------------------------------------------------------------------
 
@@ -33,37 +34,15 @@ export default function ResultImage({
 }: ResultImageProps) {
   const [imageURL, setImageURL] = useState<string>(session.image as string);
   useEffect(() => {
-    const extractFrameFromRecording = async () => {
-      const videoUrl = URL.createObjectURL(recording);
-      const videoElement = document.createElement("video");
-      videoElement.addEventListener("loadedmetadata", () => {
-        const canvas = document.createElement("canvas");
-        const width = videoElement.videoWidth;
-        const height = videoElement.videoHeight;
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          return;
-        }
-
-        videoElement.currentTime = position.frameTime;
-
-        const render = () => {
-          ctx.drawImage(videoElement, 0, 0, width, height);
-          const imageDataURL = canvas.toDataURL();
-          setImageURL(imageDataURL);
-
-          videoElement.removeEventListener("timeupdate", render);
-        };
-        videoElement.addEventListener("timeupdate", render);
-      });
-      videoElement.src = videoUrl;
-      videoElement.load();
+    const extractFrame = async () => {
+      const frameURL = await extractFrameFromRecording(
+        recording,
+        position.frameTime
+      );
+      setImageURL(frameURL);
     };
 
-    extractFrameFromRecording();
+    extractFrame();
   }, [recording, position]);
 
   return <ResultImg src={imageURL} />;

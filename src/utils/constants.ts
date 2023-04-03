@@ -31,3 +31,8 @@ export enum FaceDirection {
   LEFT = "left",
   RIGHT = "right",
 }
+export enum AVAILABLE_POSITIONS {
+  BOTTOM = "lowAnklePos",
+  TOP = "highAnklePos",
+  FRONT = "forwardAnklePos",
+}
