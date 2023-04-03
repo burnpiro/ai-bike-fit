@@ -148,7 +148,17 @@ export default function SessionPositionsDrawer({
           {Object.values(AVAILABLE_POSITIONS).map((availablePosition) => (
             <Card
               key={availablePosition}
-              sx={{ mb: 1, mt: 1 }}
+              sx={{
+                mb: 1,
+                mt: 1,
+                p: "0px",
+                border:
+                  position === availablePosition ? "4px solid grey" : "none",
+                borderRadius: "5px",
+              }}
+              variant={
+                position === availablePosition ? "outlined" : "elevation"
+              }
               onClick={() => handlePositionSelect(availablePosition)}
             >
               {imageUrls && imageUrls[availablePosition] && (
