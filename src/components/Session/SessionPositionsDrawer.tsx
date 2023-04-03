@@ -87,6 +87,7 @@ export default function SessionPositionsDrawer({
         styles={{
           ".MuiDrawer-root > .MuiPaper-root": {
             width: `calc(35% - ${drawerBleeding}px)`,
+            minWidth: "200px",
             height: "calc(100%)",
             overflow: "visible",
           },
@@ -154,7 +155,7 @@ export default function SessionPositionsDrawer({
                 <img src={imageUrls[availablePosition]} />
               )}
               {(!imageUrls || !imageUrls[availablePosition]) && (
-                <Skeleton variant={"rectangular"} height={130}/>
+                <Skeleton variant={"rectangular"} height={130} />
               )}
             </Card>
           ))}
