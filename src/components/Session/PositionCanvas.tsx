@@ -4,9 +4,16 @@ import { Box, Typography, Stack } from "@mui/material";
 import { styled } from "@mui/material/styles";
 // utils
 import { PoseWithTimestamp } from "../../utils/types";
-import { FaceDirection } from "../../utils/constants";
+import {
+  FaceDirection,
+  MAX_TOUCH_DISTANCE_TO_POINT,
+  videoConfig,
+} from "../../utils/constants";
 import { FITTING_KEYPOINTS_BY_SIDE } from "../../utils/pose-detection/constants";
 import { drawPose } from "../../utils/pose-drawing";
+import { Keypoint } from "../../utils/pose-detection";
+import { calculateXYPosition } from "../../utils/pose-drawing/calculateXYPosition";
+import { getClosestPoint } from "../../utils/pose-drawing/calculateDistanceToPoints";
 
 // ----------------------------------------------------------------------
 
@@ -51,19 +58,24 @@ interface PositionCanvasProps {
   faceDirection: FaceDirection;
   threshold?: number;
   scale?: { x: number; y: number };
+  onKeypointChange?: (keypoint: Keypoint) => void;
 }
 
 export default function PositionCanvas({
   points,
   faceDirection = FaceDirection.LEFT,
+  onKeypointChange,
   threshold = 0.4,
 }: PositionCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [scale, setScale] = useState<number>(1);
+  const [selectedPoints, setSelectedPoints] =
+    useState<PoseWithTimestamp["pose"]["keypoints"]>(points);
+  const [selectedPoint, setSelectedPoint] = useState<Keypoint | undefined>();
 
   useEffect(() => {
     if (canvasRef.current) {
-      const selectedPoints = points.filter((point) => {
+      const newSelectedPoints = points.filter((point) => {
         switch (faceDirection) {
           case FaceDirection.LEFT:
             return FITTING_KEYPOINTS_BY_SIDE[FaceDirection.LEFT].includes(
@@ -77,11 +89,49 @@ export default function PositionCanvas({
             return false;
         }
       });
-      drawPose(selectedPoints, canvasRef.current, faceDirection, true, true);
-    }
-  }, [points, faceDirection, canvasRef.current]);
 
-  useEffect(() => {}, [canvasRef.current]);
+      setSelectedPoints(newSelectedPoints);
+    }
+  }, [points, faceDirection, canvasRef.current, selectedPoint]);
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      drawPose(
+        selectedPoints.map((point) => {
+          if (selectedPoint && selectedPoint.name === point.name) {
+            return {
+              ...point,
+              selected: true,
+            };
+          }
+          return point;
+        }),
+        canvasRef.current,
+        faceDirection,
+        true,
+        true
+      );
+    }
+  }, [canvasRef.current, selectedPoint, selectedPoints]);
+
+  useEffect(() => {
+    if (canvasRef.current && onKeypointChange) {
+      const handleCanvasClick = (event: MouseEvent | TouchEvent) => {
+        const [canvasX, canvasY] = calculateXYPosition(
+          event,
+          canvasRef.current as HTMLCanvasElement
+        );
+
+        setSelectedPoint(getClosestPoint(canvasX, canvasY, selectedPoints));
+      };
+
+      canvasRef.current.addEventListener("click", handleCanvasClick);
+
+      return () => {
+        canvasRef.current?.removeEventListener("click", handleCanvasClick);
+      };
+    }
+  }, [canvasRef.current, onKeypointChange]);
 
   const handleTouchMove = (event: TouchEvent) => {
     if (event.touches.length === 2) {
@@ -97,9 +147,10 @@ export default function PositionCanvas({
 
   return (
     <ResultCanvas
+      id={"keypoints_canvas"}
       ref={canvasRef}
-      width={640}
-      height={480}
+      width={videoConfig.video.width}
+      height={videoConfig.video.height}
       sx={{ transform: `scale(${scale}, ${scale})` }}
     ></ResultCanvas>
   );

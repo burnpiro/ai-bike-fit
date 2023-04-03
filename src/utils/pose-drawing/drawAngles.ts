@@ -17,7 +17,7 @@ export function drawAngles(angles: Angle[], ctx: CanvasRenderingContext2D) {
     ctx.arc(
       angle.point2.x,
       angle.point2.y,
-      DEFAULT_RADIUS * 10,
+      DEFAULT_RADIUS * 8,
       endAngle,
       startAngle
     );
