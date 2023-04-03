@@ -26,32 +26,6 @@ const ResultCanvas = styled("canvas")({
   position: "absolute",
 });
 
-let initialPinchDistance: number | null = null;
-
-interface PinchEvent extends TouchEvent {
-  scale: number;
-}
-
-function calculateNewScale(event: PinchEvent, initialScale: number) {
-  const target = event.target as HTMLCanvasElement;
-
-  // Calculate pinch distance
-  const touch1 = event.touches[0];
-  const touch2 = event.touches[1];
-  const pinchDistance = Math.sqrt(
-    (touch1.pageX - touch2.pageX) ** 2 + (touch1.pageY - touch2.pageY) ** 2
-  );
-
-  if (initialPinchDistance === null) {
-    initialPinchDistance = pinchDistance;
-  }
-
-  return Math.max(
-    1,
-    Math.min((pinchDistance / initialPinchDistance) * initialScale, 4)
-  );
-}
-
 // --------
 interface PositionCanvasProps {
   points: PoseWithTimestamp["pose"]["keypoints"];
@@ -60,6 +34,8 @@ interface PositionCanvasProps {
   scale?: { x: number; y: number };
   onKeypointChange?: (keypoint: Keypoint) => void;
 }
+
+let prevTouch: Touch | null = null;
 
 export default function PositionCanvas({
   points,
@@ -91,8 +67,57 @@ export default function PositionCanvas({
       });
 
       setSelectedPoints(newSelectedPoints);
+      if (selectedPoint) {
+        setSelectedPoint(
+          newSelectedPoints.find((el) => el.name === selectedPoint.name)
+        );
+      }
     }
-  }, [points, faceDirection, canvasRef.current, selectedPoint]);
+  }, [points, faceDirection, canvasRef.current]);
+
+  useEffect(() => {
+    const handleKeypointMove = (event: TouchEvent) => {
+      if (selectedPoint) {
+        const currTouch = event.changedTouches[0];
+
+        let deltaX = 0;
+        let deltaY = 0;
+        if (prevTouch) {
+          deltaX = currTouch.clientX - prevTouch.clientX;
+          deltaY = currTouch.clientY - prevTouch.clientY;
+        }
+
+        prevTouch = currTouch;
+
+        setSelectedPoint({
+          ...selectedPoint,
+          x: selectedPoint.x + deltaX,
+          y: selectedPoint.y + deltaY,
+        });
+      }
+    };
+
+    const clearPrevTouch = () => {
+      prevTouch = null;
+      if (onKeypointChange && selectedPoint) {
+        onKeypointChange({
+          ...selectedPoint,
+          x: selectedPoint.x,
+          y: selectedPoint.y,
+        });
+      }
+    };
+
+    if (canvasRef.current) {
+      canvasRef.current.addEventListener("touchmove", handleKeypointMove);
+      canvasRef.current.addEventListener("touchend", clearPrevTouch);
+
+      return () => {
+        canvasRef.current?.removeEventListener("touchmove", handleKeypointMove);
+        canvasRef.current?.removeEventListener("touchend", clearPrevTouch);
+      };
+    }
+  }, [onKeypointChange, canvasRef.current, selectedPoint]);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -100,7 +125,7 @@ export default function PositionCanvas({
         selectedPoints.map((point) => {
           if (selectedPoint && selectedPoint.name === point.name) {
             return {
-              ...point,
+              ...selectedPoint,
               selected: true,
             };
           }
@@ -132,18 +157,6 @@ export default function PositionCanvas({
       };
     }
   }, [canvasRef.current, onKeypointChange]);
-
-  const handleTouchMove = (event: TouchEvent) => {
-    if (event.touches.length === 2) {
-      event.preventDefault(); // Prevent default pinch gesture behavior
-      const newScale = calculateNewScale(event as PinchEvent, scale);
-      setScale(newScale);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    initialPinchDistance = null;
-  };
 
   return (
     <ResultCanvas

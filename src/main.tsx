@@ -12,7 +12,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 
 window.addEventListener('resize', () => {
     // We execute the same script as before
-    let vh = window.innerHeight * 0.01;
+    let vh = document.documentElement.clientHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
     let vw = window.innerWidth * 0.01;
     document.documentElement.style.setProperty('--vw', `${vw}px`);
