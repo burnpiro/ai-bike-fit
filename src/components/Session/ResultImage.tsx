@@ -25,12 +25,16 @@ interface ResultImageProps {
   session: Session;
   recording: Blob;
   position: PoseWithTimestamp;
+  scale?: number;
+  translate?: string;
 }
 
 export default function ResultImage({
   session,
   recording,
   position,
+  scale,
+  translate,
 }: ResultImageProps) {
   const [imageURL, setImageURL] = useState<string>(session.image as string);
   useEffect(() => {
@@ -45,5 +49,14 @@ export default function ResultImage({
     extractFrame();
   }, [recording, position]);
 
-  return <ResultImg src={imageURL} />;
+  return (
+    <ResultImg
+      src={imageURL}
+      style={{
+        transform: `${scale ? `scale(${scale})` : "scale(1)"} ${
+          translate ? translate : ""
+        }`,
+      }}
+    />
+  );
 }

@@ -31,20 +31,65 @@ interface PositionCanvasProps {
   points: PoseWithTimestamp["pose"]["keypoints"];
   faceDirection: FaceDirection;
   threshold?: number;
-  scale?: { x: number; y: number };
+  scale?: number;
+  translate?: string;
   onKeypointChange?: (keypoint: Keypoint) => void;
+  onScaleChange?: (newScale: number, newTransform: string) => void;
 }
 
+interface PinchState {
+  initialPinchDistance: number;
+  initialScale: number;
+  initialX: number;
+  initialY: number;
+  x: number;
+  y: number;
+}
+
+let pinchState: PinchState | null = null;
+
 let prevTouch: Touch | null = null;
+let currScale: number = 1;
+
+const handlePinch = (
+  event: TouchEvent,
+  initScale: number,
+  translate?: string
+): [number, string] => {
+  if (pinchState) {
+    // Calculate pinch distance
+    const touch1 = event.touches[0];
+    const touch2 = event.touches[1];
+    const currentPinchDistance = Math.sqrt(
+      (touch1.pageX - touch2.pageX) ** 2 + (touch1.pageY - touch2.pageY) ** 2
+    );
+    const currScale = Math.max(
+      1,
+      Math.min(
+        (currentPinchDistance / pinchState.initialPinchDistance) * initScale,
+        4
+      )
+    );
+
+    const dx = touch1.pageX - pinchState.initialX + pinchState.x;
+    const dy = touch1.pageY - pinchState.initialY + pinchState.y;
+
+    return [currScale, `translate(${dx}px, ${dy}px)`];
+  }
+
+  return [currScale, ""];
+};
 
 export default function PositionCanvas({
   points,
   faceDirection = FaceDirection.LEFT,
   onKeypointChange,
+  onScaleChange,
+  translate = "",
+  scale = 1,
   threshold = 0.4,
 }: PositionCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [scale, setScale] = useState<number>(1);
   const [selectedPoints, setSelectedPoints] =
     useState<PoseWithTimestamp["pose"]["keypoints"]>(points);
   const [selectedPoint, setSelectedPoint] = useState<Keypoint | undefined>();
@@ -76,8 +121,38 @@ export default function PositionCanvas({
   }, [points, faceDirection, canvasRef.current]);
 
   useEffect(() => {
+    const handlePinchStart = (event: TouchEvent) => {
+      if (event.touches.length > 1) {
+        const touch1 = event.touches[0];
+        const touch2 = event.touches[1];
+
+        pinchState = {
+          initialPinchDistance: Math.sqrt(
+            (touch1.pageX - touch2.pageX) ** 2 +
+              (touch1.pageY - touch2.pageY) ** 2
+          ),
+          initialScale: scale || 1,
+          initialX: touch1.pageX,
+          initialY: touch1.pageY,
+          x:
+            parseFloat(
+              translate.replace(/.*translate\(\s*(.*)\s*,\s*(.*)\s*\).*/, "$1")
+            ) || 0,
+          y:
+            parseFloat(
+              translate.replace(/.*translate\(\s*(.*)\s*,\s*(.*)\s*\).*/, "$2")
+            ) || 0,
+        };
+      }
+    };
     const handleKeypointMove = (event: TouchEvent) => {
-      if (selectedPoint) {
+      event.preventDefault(); // Prevent default pinch gesture behavior
+      if (event.touches.length > 1) {
+        const [newScale, newTransform] = handlePinch(event, scale, translate);
+        if (onScaleChange) {
+          onScaleChange(newScale, newTransform);
+        }
+      } else if (selectedPoint) {
         const currTouch = event.changedTouches[0];
 
         let deltaX = 0;
@@ -99,6 +174,7 @@ export default function PositionCanvas({
 
     const clearPrevTouch = () => {
       prevTouch = null;
+      pinchState = null;
       if (onKeypointChange && selectedPoint) {
         onKeypointChange({
           ...selectedPoint,
@@ -109,15 +185,17 @@ export default function PositionCanvas({
     };
 
     if (canvasRef.current) {
+      canvasRef.current.addEventListener("touchstart", handlePinchStart);
       canvasRef.current.addEventListener("touchmove", handleKeypointMove);
       canvasRef.current.addEventListener("touchend", clearPrevTouch);
 
       return () => {
+        canvasRef.current?.removeEventListener("touchstart", handlePinchStart);
         canvasRef.current?.removeEventListener("touchmove", handleKeypointMove);
         canvasRef.current?.removeEventListener("touchend", clearPrevTouch);
       };
     }
-  }, [onKeypointChange, canvasRef.current, selectedPoint]);
+  }, [onKeypointChange, onScaleChange, canvasRef.current, selectedPoint]);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -141,11 +219,12 @@ export default function PositionCanvas({
 
   useEffect(() => {
     if (canvasRef.current && onKeypointChange) {
-      const handleCanvasClick = (event: MouseEvent | TouchEvent) => {
+      const handleCanvasClick = (event: MouseEvent) => {
         const [canvasX, canvasY] = calculateXYPosition(
           event,
           canvasRef.current as HTMLCanvasElement
         );
+        console.log(canvasX, canvasY);
 
         setSelectedPoint(getClosestPoint(canvasX, canvasY, selectedPoints));
       };
@@ -164,7 +243,11 @@ export default function PositionCanvas({
       ref={canvasRef}
       width={videoConfig.video.width}
       height={videoConfig.video.height}
-      sx={{ transform: `scale(${scale}, ${scale})` }}
+      sx={{
+        transform: `${scale ? `scale(${scale})` : "scale(1)"} ${
+          translate ? translate : ""
+        }`,
+      }}
     ></ResultCanvas>
   );
 }

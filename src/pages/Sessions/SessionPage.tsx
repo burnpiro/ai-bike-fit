@@ -13,6 +13,7 @@ import PositionCanvas from "../../components/Session/PositionCanvas";
 import SessionPositionsDrawer from "../../components/Session/SessionPositionsDrawer";
 import { PoseWithTimestamp } from "../../utils/types";
 import { Keypoint } from "../../utils/pose-detection";
+import { string } from "@tensorflow/tfjs-core";
 
 function SessionPage() {
   let { id } = useParams<"id">();
@@ -23,6 +24,10 @@ function SessionPage() {
   );
   const [positions, setPositions] =
     useState<Record<AVAILABLE_POSITIONS, PoseWithTimestamp>>();
+
+  const [[scale, translate], setScaleAndTranslate] = useState<
+    [number | undefined, string | undefined]
+  >([1, `translate(0px, 0px)`]);
 
   useEffect(() => {
     if (id) {
@@ -78,6 +83,10 @@ function SessionPage() {
     }
   };
 
+  const handleScaleChange = (newScale?: number, newTranslate?: string) => {
+    setScaleAndTranslate([newScale, newTranslate]);
+  };
+
   return (
     <Stack sx={{ height: "100%", width: "100%", position: "relative" }}>
       {recording && session && currPosition && (
@@ -92,6 +101,8 @@ function SessionPage() {
         <ResultImage
           session={session}
           recording={recording}
+          scale={scale}
+          translate={translate}
           position={positions[currPosition]}
         />
       )}
@@ -100,6 +111,9 @@ function SessionPage() {
           points={positions[currPosition].pose.keypoints}
           faceDirection={session.faceDirection as FaceDirection}
           onKeypointChange={handleKeypointChange}
+          onScaleChange={handleScaleChange}
+          scale={scale}
+          translate={translate}
         />
       )}
       {(!recording || !session) && (
