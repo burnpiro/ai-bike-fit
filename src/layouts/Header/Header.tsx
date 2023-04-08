@@ -32,29 +32,24 @@ const StyledRoot = styled(AppBar)(({ theme }) => ({
   },
 }));
 
-const StyledToolbar = styled(Toolbar)(({ theme }) => ({
-  minHeight: HEADER_MOBILE,
-  [theme.breakpoints.up("lg")]: {
-    minHeight: HEADER_DESKTOP,
-    padding: theme.spacing(0, 5),
-  },
-}));
-
 interface HeaderProps {
   onOpenNav: () => void;
 }
 
 const fabStyle = {
   position: "absolute",
-  top: 16,
-  left: 16,
+  top: 0,
+  left: 0,
+  p: 1,
+  pb: 0,
+  borderBottomRightRadius: 4,
 };
 
 const fabRedStyle = {
   color: "secondary.contrastText",
-  bgcolor: 'secondary.main',
+  bgcolor: "grey.400",
   "&:hover": {
-    bgcolor: 'secondary.light',
+    bgcolor: "grey.300",
   },
 };
 
@@ -66,17 +61,9 @@ const fabConfig = {
 export default function Header({ onOpenNav }: HeaderProps) {
   return (
     <StyledRoot>
-      {/*<StyledToolbar>*/}
-      <Fab
-        sx={fabConfig.sx}
-        aria-label={"Menu"}
-        color={fabConfig.color}
-        onClick={onOpenNav}
-        size={"medium"}
-      >
-        <Iconify icon="eva:menu-2-fill" width={28}/>
-      </Fab>
-      {/*</StyledToolbar>*/}
+      <Box sx={fabConfig.sx} aria-label={"Menu"} onClick={onOpenNav}>
+        <Iconify icon="eva:menu-2-fill" width={28} />
+      </Box>
     </StyledRoot>
   );
 }

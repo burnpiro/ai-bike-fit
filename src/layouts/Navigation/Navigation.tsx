@@ -57,10 +57,6 @@ export default function Navigation({ openNav, onCloseNav }: NavigationProps) {
   return (
     <Box
       component="nav"
-      sx={{
-        flexShrink: { lg: 0 },
-        width: { lg: NAV_WIDTH },
-      }}
     >
       {
         <Drawer
