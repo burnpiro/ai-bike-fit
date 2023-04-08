@@ -24,7 +24,7 @@ const Logo = forwardRef(
     }
 
     return (
-      <Link to="/" component={RouterLink} sx={{ display: "contents" }}>
+      <Link to={`${import.meta.env.BASE_URL}`} component={RouterLink} sx={{ display: "contents" }}>
         {logo}
       </Link>
     );

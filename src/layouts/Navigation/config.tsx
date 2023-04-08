@@ -19,22 +19,22 @@ const icon = (name: string, color?: string) => (
 const navConfig = [
   {
     title: "My sessions",
-    path: "/dashboard/app",
+    path: `${import.meta.env.BASE_URL}/dashboard/app`,
     icon: icon("mdi:view-dashboard-outline", '#76B0F1'),
   },
   {
     title: "record session",
-    path: "/dashboard/record",
+    path: `${import.meta.env.BASE_URL}/dashboard/record`,
     icon: icon("mdi:record-circle-outline", '#FF4842'),
   },
   {
     title: "FAQ",
-    path: "/dashboard/faq",
+    path: `${import.meta.env.BASE_URL}/dashboard/faq`,
     icon: icon("ic:round-support-agent", '#76B0F1'),
   },
   {
     title: "Buy a coffee",
-    path: "/dashboard/support",
+    path: `${import.meta.env.BASE_URL}/dashboard/support`,
     icon: icon("cib:buy-me-a-coffee", '#76B0F1'),
   },
 ];

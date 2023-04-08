@@ -7,6 +7,7 @@ export default defineConfig({
   build: {
     manifest: true,
   },
+  base: 'ai-bike-fit',
   server: {
     port: 3000,
     host: true,

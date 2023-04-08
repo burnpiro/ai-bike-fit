@@ -13,28 +13,37 @@ import {SessionsListPage, SessionPage} from "../pages/Sessions";
 export function Router() {
     const routes = useRoutes([
         {
-            path: "/dashboard",
-            element: <DashboardLayout />,
+            path: `${import.meta.env.BASE_URL}`,
             children: [
-                { element: <Navigate to="/dashboard/app" />, index: true },
-                { path: "app", element: <SessionsListPage /> },
-                { path: "session/:id", element: <SessionPage /> },
-                { path: "record", element: <RecordSessionPage /> },
-                { path: "faq", element: <FAQPage /> },
-                { path: "support", element: <div /> },
-            ],
-        },
-        {
-            element: <BasicLayout />,
-            children: [
-                { element: <Navigate to="/dashboard/app" />, index: true },
-                { path: "404", element: <Page404 /> },
-                { path: "*", element: <Navigate to="/404" /> },
-            ],
+                {
+                    path: "dashboard",
+                    element: <DashboardLayout />,
+                    children: [
+                        { element: <Navigate to={`${import.meta.env.BASE_URL
+                            }/dashboard/app`} />, index: true },
+                        { path: "app", element: <SessionsListPage /> },
+                        { path: "session/:id", element: <SessionPage /> },
+                        { path: "record", element: <RecordSessionPage /> },
+                        { path: "faq", element: <FAQPage /> },
+                        { path: "support", element: <div /> },
+                    ],
+                },
+                {
+                    element: <BasicLayout />,
+                    children: [
+                        { element: <Navigate to={`${import.meta.env.BASE_URL
+                            }/dashboard/app`} />, index: true },
+                        { path: "404", element: <Page404 /> },
+                        { path: "*", element: <Navigate to={`/${import.meta.env.BASE
+                            }/404`} /> },
+                    ],
+                },
+            ]
         },
         {
             path: "*",
-            element: <Navigate to="/404" replace />,
+            element: <Navigate to={`${import.meta.env.BASE_URL
+            }/404`} replace />,
         },
     ]);
 

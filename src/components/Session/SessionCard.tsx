@@ -22,7 +22,8 @@ interface SessionCardProps {
 
 export default function SessionCard({ session }: SessionCardProps) {
   return (
-    <Link color="inherit" to={`/dashboard/session/${session.id}`}>
+    <Link color="inherit" to={`${import.meta.env.BASE_URL
+    }/dashboard/session/${session.id}`}>
       <Card>
         <Box sx={{ pt: "100%", position: "relative" }}>
           <StyledImg alt={"main image preview"} src={session.image} />

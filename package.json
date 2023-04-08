@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "homepage": "https://burnpiro.github.io/ai-bike-fit/",
   "scripts": {
     "start": "vite",
     "dev": "vite",

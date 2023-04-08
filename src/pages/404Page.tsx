@@ -35,7 +35,7 @@ export default function Page404() {
                         Sorry, we couldn’t find the page you’re looking for.
                     </Typography>
 
-                    <Button to="/" size="large" variant="contained" component={RouterLink}>
+                    <Button to={`${import.meta.env.BASE_URL}`} size="large" variant="contained" component={RouterLink}>
                         Go to Home
                     </Button>
                 </StyledContent>
