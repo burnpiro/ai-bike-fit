@@ -29,8 +29,8 @@ function RecordVideoPage({ onNext }: RecordVideoPageProps) {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const orientation = useDeviceOrientation();
   const [recorderRef, setRecorderRef] = useState<MediaRecorder | null>(null);
-  const [startRecordingAudio] = useAudio("/assets/sounds/start-recording.mp3");
-  const [endRecordingAudio] = useAudio("/assets/sounds/end-recording.mp3");
+  const [startRecordingAudio] = useAudio(`${import.meta.env.BASE_URL}/assets/sounds/start-recording.mp3`);
+  const [endRecordingAudio] = useAudio(`${import.meta.env.BASE_URL}/assets/sounds/end-recording.mp3`);
 
   const handleCameraStreamAvailable = (mediaStream: MediaStream) => {
     if (mediaStream) {

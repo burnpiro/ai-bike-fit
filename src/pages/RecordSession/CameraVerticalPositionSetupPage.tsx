@@ -56,7 +56,7 @@ function CameraVerticalPositionSetupPage({
           </div>
         </Stack>
         <img
-          src={"/assets/images/back-bicycle.png"}
+          src={`${import.meta.env.BASE_URL}/assets/images/back-bicycle.png`}
           style={{ height: "calc(var(--vh, 1vh) * 60)" }}
         />
       </Stack>

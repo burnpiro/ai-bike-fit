@@ -14,7 +14,7 @@ const Logo = forwardRef(
     const logo = (
       <Box
         component="img"
-        src="/logo.svg"
+        src={`${import.meta.env.BASE_URL}/logo.svg`}
         sx={{ width: 64, height: 64, cursor: 'pointer', ...sx }}
       />
     );

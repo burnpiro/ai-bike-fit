@@ -56,7 +56,7 @@ function CameraHorizontalPositionSetupPage({
           </div>
         </Stack>
         <img
-          src={"/assets/images/top-bicycle.png"}
+          src={`${import.meta.env.BASE_URL}/assets/images/top-bicycle.png`}
           style={{ height: "calc(var(--vh, 1vh) * 60)" }}
         />
       </Stack>
