@@ -14,6 +14,7 @@ import SessionPositionsDrawer from "../../components/Session/SessionPositionsDra
 import { PoseWithTimestamp } from "../../utils/types";
 import { Keypoint } from "../../utils/pose-detection";
 import { string } from "@tensorflow/tfjs-core";
+import { FITTING_KEYPOINTS_BY_SIDE } from "../../utils/pose-detection/constants";
 
 function SessionPage() {
   let { id } = useParams<"id">();
@@ -22,6 +23,9 @@ function SessionPage() {
   const [currPosition, setCurrPosition] = useState<AVAILABLE_POSITIONS>(
     AVAILABLE_POSITIONS.TOP
   );
+  const [selectedPoints, setSelectedPoints] = useState<
+    PoseWithTimestamp["pose"]["keypoints"]
+  >([]);
   const [positions, setPositions] =
     useState<Record<AVAILABLE_POSITIONS, PoseWithTimestamp>>();
 
@@ -57,6 +61,27 @@ function SessionPage() {
       getRecordingAsync();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (positions) {
+      const newSelectedPoints = positions[currPosition].pose.keypoints.filter(
+        (point) => {
+          switch (session?.faceDirection as FaceDirection) {
+            case FaceDirection.RIGHT:
+              return FITTING_KEYPOINTS_BY_SIDE[FaceDirection.RIGHT].includes(
+                point.name as string
+              );
+            case FaceDirection.LEFT:
+            default:
+              return FITTING_KEYPOINTS_BY_SIDE[FaceDirection.LEFT].includes(
+                  point.name as string
+              );
+          }
+        }
+      );
+      setSelectedPoints(newSelectedPoints);
+    }
+  }, [positions, currPosition]);
 
   const handlePositionChange = (newPosition: AVAILABLE_POSITIONS) => {
     if (session && session[newPosition]) {
@@ -106,9 +131,9 @@ function SessionPage() {
           position={positions[currPosition]}
         />
       )}
-      {recording && session && currPosition && positions && (
+      {recording && session && currPosition && selectedPoints.length > 0 && (
         <PositionCanvas
-          points={positions[currPosition].pose.keypoints}
+          selectedPoints={selectedPoints}
           faceDirection={session.faceDirection as FaceDirection}
           onKeypointChange={handleKeypointChange}
           onScaleChange={handleScaleChange}

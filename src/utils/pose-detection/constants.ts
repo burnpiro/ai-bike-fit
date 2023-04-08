@@ -1,4 +1,4 @@
-import {FaceDirection} from "../constants";
+import { AVAILABLE_POSITIONS, FaceDirection } from "../constants";
 
 /**
  * @license
@@ -145,4 +145,51 @@ export const FITTING_CONNECTED_KEYPOINTS_ANGLES = {
       KEYPOINT_NAMES.RIGHT_ANKLE,
     ],
   ],
+};
+
+export const FITTING_ANGLE_NAMES = {
+  elbow: {
+    index: 0,
+    name: "Elbow Angle",
+    positions: {
+      [AVAILABLE_POSITIONS.BOTTOM]: {
+        maxVal: 165,
+        minVal: 150,
+      },
+    },
+  },
+  shoulder: {
+    index: 1,
+    name: "Shoulder Angle",
+    positions: {
+      [AVAILABLE_POSITIONS.BOTTOM]: {
+        maxVal: 80,
+        minVal: 90,
+      },
+    },
+  },
+  hip: {
+    index: 2,
+    name: "Hip Angle",
+    positions: {
+      [AVAILABLE_POSITIONS.TOP]: {
+        maxVal: 50,
+        minVal: 40,
+      },
+    },
+  },
+  knee: {
+    index: 3,
+    name: "Knee Angle",
+    positions: {
+      [AVAILABLE_POSITIONS.TOP]: {
+        maxVal: 68,
+        minVal: 74,
+      },
+      [AVAILABLE_POSITIONS.BOTTOM]: {
+        maxVal: 146,
+        minVal: 135,
+      },
+    },
+  },
 };

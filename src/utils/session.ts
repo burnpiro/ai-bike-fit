@@ -3,7 +3,7 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 import {PoseWithTimestamp} from "./types";
 import {KEYPOINT_NAMES} from "./pose-detection/constants";
 import {filterPosition} from "./pose-detection";
-import {FaceDirection} from "./constants";
+import {AVAILABLE_POSITIONS, FaceDirection} from "./constants";
 
 dayjs.extend(localizedFormat);
 
@@ -13,9 +13,9 @@ export type SessionData = {
   image?: string;
   faceDirection?: FaceDirection;
   poses?: PoseWithTimestamp[];
-  lowAnklePos?: PoseWithTimestamp;
-  highAnklePos?: PoseWithTimestamp;
-  forwardAnklePos?: PoseWithTimestamp;
+  [AVAILABLE_POSITIONS.BOTTOM]?: PoseWithTimestamp;
+  [AVAILABLE_POSITIONS.TOP]?: PoseWithTimestamp;
+  [AVAILABLE_POSITIONS.FRONT]?: PoseWithTimestamp;
 };
 
 export class Session {
@@ -25,9 +25,9 @@ export class Session {
   bicycle?: string;
   image?: string;
   faceDirection?: FaceDirection;
-  lowAnklePos?: PoseWithTimestamp;
-  highAnklePos?: PoseWithTimestamp;
-  forwardAnklePos?: PoseWithTimestamp;
+  [AVAILABLE_POSITIONS.BOTTOM]?: PoseWithTimestamp;
+  [AVAILABLE_POSITIONS.TOP]?: PoseWithTimestamp;
+  [AVAILABLE_POSITIONS.FRONT]?: PoseWithTimestamp;
   poses?: PoseWithTimestamp[];
   constructor(data?: SessionData) {
     this.timestamp = data?.timestamp || new Date().getTime();
@@ -35,9 +35,9 @@ export class Session {
     this.image = data?.image;
     this.bicycle = data?.bicycle;
     this.poses = data?.poses;
-    this.lowAnklePos = data?.lowAnklePos;
-    this.highAnklePos = data?.highAnklePos;
-    this.forwardAnklePos = data?.forwardAnklePos;
+    this[AVAILABLE_POSITIONS.BOTTOM] = data?.[AVAILABLE_POSITIONS.BOTTOM];
+    this[AVAILABLE_POSITIONS.TOP] = data?.[AVAILABLE_POSITIONS.TOP];
+    this[AVAILABLE_POSITIONS.FRONT] = data?.[AVAILABLE_POSITIONS.FRONT];
     this.date = dayjs(this.timestamp);
   }
 
@@ -47,9 +47,9 @@ export class Session {
       bicycle: this.bicycle,
       image: this.image,
       poses: this.poses,
-      lowAnklePos: this.lowAnklePos,
-      highAnklePos: this.highAnklePos,
-      forwardAnklePos: this.forwardAnklePos,
+      [AVAILABLE_POSITIONS.BOTTOM]: this[AVAILABLE_POSITIONS.BOTTOM],
+      [AVAILABLE_POSITIONS.TOP]: this[AVAILABLE_POSITIONS.TOP],
+      [AVAILABLE_POSITIONS.FRONT]: this[AVAILABLE_POSITIONS.FRONT],
     };
   }
 
@@ -86,7 +86,7 @@ export class Session {
       }
     }
 
-    this.lowAnklePos = filterPosition(
+    this[AVAILABLE_POSITIONS.BOTTOM] = filterPosition(
       newPoses,
       this.faceDirection === FaceDirection.LEFT
         ? KEYPOINT_NAMES.LEFT_ANKLE
@@ -94,7 +94,7 @@ export class Session {
       (a, b) => a.y > b.y
     );
 
-    this.highAnklePos = filterPosition(
+    this[AVAILABLE_POSITIONS.TOP] = filterPosition(
       newPoses,
       this.faceDirection === FaceDirection.LEFT
         ? KEYPOINT_NAMES.LEFT_ANKLE
@@ -102,7 +102,7 @@ export class Session {
       (a, b) => a.y < b.y
     );
 
-    this.forwardAnklePos = filterPosition(
+    this[AVAILABLE_POSITIONS.FRONT] = filterPosition(
       newPoses,
       this.faceDirection === FaceDirection.LEFT
         ? KEYPOINT_NAMES.LEFT_ANKLE

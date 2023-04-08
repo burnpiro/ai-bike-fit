@@ -14,6 +14,7 @@ import { drawPose } from "../../utils/pose-drawing";
 import { Keypoint } from "../../utils/pose-detection";
 import { calculateXYPosition } from "../../utils/pose-drawing/calculateXYPosition";
 import { getClosestPoint } from "../../utils/pose-drawing/calculateDistanceToPoints";
+import {handlePinch, PinchState} from "../../utils/eventHelpers/pinchEventHandler";
 
 // ----------------------------------------------------------------------
 
@@ -28,7 +29,7 @@ const ResultCanvas = styled("canvas")({
 
 // --------
 interface PositionCanvasProps {
-  points: PoseWithTimestamp["pose"]["keypoints"];
+  selectedPoints: PoseWithTimestamp["pose"]["keypoints"];
   faceDirection: FaceDirection;
   threshold?: number;
   scale?: number;
@@ -37,51 +38,11 @@ interface PositionCanvasProps {
   onScaleChange?: (newScale: number, newTransform: string) => void;
 }
 
-interface PinchState {
-  initialPinchDistance: number;
-  initialScale: number;
-  initialX: number;
-  initialY: number;
-  x: number;
-  y: number;
-}
-
+let prevTouch: Touch | null = null;
 let pinchState: PinchState | null = null;
 
-let prevTouch: Touch | null = null;
-let currScale: number = 1;
-
-const handlePinch = (
-  event: TouchEvent,
-  initScale: number,
-  translate?: string
-): [number, string] => {
-  if (pinchState) {
-    // Calculate pinch distance
-    const touch1 = event.touches[0];
-    const touch2 = event.touches[1];
-    const currentPinchDistance = Math.sqrt(
-      (touch1.pageX - touch2.pageX) ** 2 + (touch1.pageY - touch2.pageY) ** 2
-    );
-    const currScale = Math.max(
-      1,
-      Math.min(
-        (currentPinchDistance / pinchState.initialPinchDistance) * initScale,
-        4
-      )
-    );
-
-    const dx = touch1.pageX - pinchState.initialX + pinchState.x;
-    const dy = touch1.pageY - pinchState.initialY + pinchState.y;
-
-    return [currScale, `translate(${dx}px, ${dy}px)`];
-  }
-
-  return [currScale, ""];
-};
-
 export default function PositionCanvas({
-  points,
+  selectedPoints,
   faceDirection = FaceDirection.LEFT,
   onKeypointChange,
   onScaleChange,
@@ -90,35 +51,7 @@ export default function PositionCanvas({
   threshold = 0.4,
 }: PositionCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [selectedPoints, setSelectedPoints] =
-    useState<PoseWithTimestamp["pose"]["keypoints"]>(points);
   const [selectedPoint, setSelectedPoint] = useState<Keypoint | undefined>();
-
-  useEffect(() => {
-    if (canvasRef.current) {
-      const newSelectedPoints = points.filter((point) => {
-        switch (faceDirection) {
-          case FaceDirection.LEFT:
-            return FITTING_KEYPOINTS_BY_SIDE[FaceDirection.LEFT].includes(
-              point.name as string
-            );
-          case FaceDirection.RIGHT:
-            return FITTING_KEYPOINTS_BY_SIDE[FaceDirection.RIGHT].includes(
-              point.name as string
-            );
-          default:
-            return false;
-        }
-      });
-
-      setSelectedPoints(newSelectedPoints);
-      if (selectedPoint) {
-        setSelectedPoint(
-          newSelectedPoints.find((el) => el.name === selectedPoint.name)
-        );
-      }
-    }
-  }, [points, faceDirection, canvasRef.current]);
 
   useEffect(() => {
     const handlePinchStart = (event: TouchEvent) => {
@@ -148,7 +81,7 @@ export default function PositionCanvas({
     const handleKeypointMove = (event: TouchEvent) => {
       event.preventDefault(); // Prevent default pinch gesture behavior
       if (event.touches.length > 1) {
-        const [newScale, newTransform] = handlePinch(event, scale, translate);
+        const [newScale, newTransform] = handlePinch(pinchState, event, scale, translate);
         if (onScaleChange) {
           onScaleChange(newScale, newTransform);
         }
@@ -224,7 +157,6 @@ export default function PositionCanvas({
           event,
           canvasRef.current as HTMLCanvasElement
         );
-        console.log(canvasX, canvasY);
 
         setSelectedPoint(getClosestPoint(canvasX, canvasY, selectedPoints));
       };
