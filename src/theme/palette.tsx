@@ -100,6 +100,7 @@ const palette = {
     background: {
         paper: BACKGROUND.PAPER,
         default: BACKGROUND.DEFAULT,
+        transparent: alpha(BACKGROUND.DEFAULT, 0.4),
         neutral: GREY[700],
         light: GREY[200],
     },

@@ -47,6 +47,7 @@ declare module '@mui/material/styles' {
     }
     interface TypeBackground {
         neutral: string;
+        transparent: string;
         light: string;
     }
     // allow configuration using `createTheme`
