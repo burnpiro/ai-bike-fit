@@ -1,4 +1,6 @@
 import React, { Fragment, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import "@tensorflow/tfjs-backend-webgl";
 import {
   initializeModel,
@@ -38,6 +40,7 @@ enum ProcessingSteps {
 }
 
 function ProcessRecordingPage({ recording }: ProcessRecordingPageProps) {
+  const navigate = useNavigate();
   const [detector, setDetector] = useState<PoseDetector | null>(null);
   const [step, setStep] = useState<ProcessingSteps>(
     ProcessingSteps.frameProcessing
@@ -142,7 +145,7 @@ function ProcessRecordingPage({ recording }: ProcessRecordingPageProps) {
         newRecordingSession.setPoses(poses);
 
         storeRecording(newRecordingSession, recording).then((id) => {
-          console.log(id);
+          navigate(`${import.meta.env.BASE_URL}/dashboard/session/${id}`);
         });
       };
 
@@ -157,7 +160,12 @@ function ProcessRecordingPage({ recording }: ProcessRecordingPageProps) {
       sx={{ height: "100%" }}
     >
       <BikeLoader />
-      {step === ProcessingSteps.frameProcessing && (
+      {step === ProcessingSteps.frameProcessing && currFrame === 1 && (
+        <Typography sx={{ textAlign: "center" }} variant={"h6"}>
+          Preparing recording for processing
+        </Typography>
+      )}
+      {step === ProcessingSteps.frameProcessing && currFrame > 1 && (
         <Fragment>
           <Typography sx={{ textAlign: "center" }} variant={"h6"}>
             Processing Frame:
